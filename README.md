@@ -1,0 +1,2 @@
+# VibeCodingPOS
+Vibe Coding POS
