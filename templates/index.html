@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}POS 銷售系統 - 首頁{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h2><i class="fas fa-store"></i> 商品選購</h2>
+        <hr>
+
+        <div class="row">
+            {% for product in products %}
+            <div class="col-md-4 mb-4">
+                <div class="card product-card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-muted">{{ product.category }}</p>
+                        <div class="price-text mb-2">
+                            NT$ {{ product.price }}
+                        </div>
+                        {% if product.stock <= 0 %}
+                        <div class="stock-warning mb-2">
+                            <i class="fas fa-exclamation-triangle"></i> 已售完
+                        </div>
+                        {% else %}
+                        <div class="mb-2">
+                            <i class="fas fa-box"></i> 庫存: {{ product.stock }}
+                        </div>
+                        {% endif %}
+
+                        {% if product.stock > 0 %}
+                        <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}" class="d-inline">
+                            <div class="input-group mb-2">
+                                <input type="number" name="quantity" class="form-control" value="1" min="1" max="{{ product.stock }}">
+                                <button type="submit" class="btn btn-add-cart">
+                                    <i class="fas fa-cart-plus"></i> 加入購物車
+                                </button>
+                            </div>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-shopping-cart"></i> 購物車摘要</h5>
+            </div>
+            <div class="card-body">
+                {% if cart_items %}
+                <div class="mb-3">
+                    {% for item in cart_items %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <strong>{{ item.product.name }}</strong>
+                            <br>
+                            <small class="text-muted">x{{ item.quantity }}</small>
+                        </div>
+                        <div class="text-end">
+                            <div>NT$ {{ item.subtotal }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <hr>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>總計:</strong>
+                    <strong class="price-text">NT$ {{ cart_total }}</strong>
+                </div>
+
+                {% if member %}
+                <div class="d-flex justify-content-between align-items-center mb-2 text-success">
+                    <span>會員折扣:</span>
+                    <span>-NT$ {{ cart_total * member.discount }}</span>
+                </div>
+                {% endif %}
+
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('cart') }}" class="btn btn-success">
+                        <i class="fas fa-eye"></i> 查看購物車
+                    </a>
+                    <a href="{{ url_for('checkout') }}" class="btn btn-primary">
+                        <i class="fas fa-credit-card"></i> 結帳
+                    </a>
+                </div>
+                {% else %}
+                <div class="text-center text-muted">
+                    <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                    <p>購物車是空的</p>
+                    <p>開始選購商品吧！</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if member %}
+        <div class="card mt-3">
+            <div class="card-header member-info">
+                <h6 class="mb-0"><i class="fas fa-user"></i> 會員資訊</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>姓名:</strong> {{ member.name }}</p>
+                <p><strong>等級:</strong> {{ member.level }}</p>
+                <p><strong>積分:</strong> {{ member.points }}</p>
+                <p><strong>折扣:</strong> {{ (member.discount * 100)|int }}%</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

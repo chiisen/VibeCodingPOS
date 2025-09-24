@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}POS 銷售系統 - 結帳{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h2><i class="fas fa-credit-card"></i> 結帳</h2>
+        <hr>
+
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0"><i class="fas fa-list"></i> 訂單明細</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>商品</th>
+                                <th>單價</th>
+                                <th>數量</th>
+                                <th>小計</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                            <tr>
+                                <td>
+                                    <strong>{{ item.product.name }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ item.product.category }}</small>
+                                </td>
+                                <td>NT$ {{ item.product.price }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td class="price-text">NT$ {{ item.subtotal }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-calculator"></i> 付款方式</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="cash" value="現金" checked>
+                                <label class="form-check-label" for="cash">
+                                    <i class="fas fa-money-bill-wave fa-2x text-success"></i>
+                                    <br>
+                                    <strong>現金</strong>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="credit" value="信用卡">
+                                <label class="form-check-label" for="credit">
+                                    <i class="fas fa-credit-card fa-2x text-primary"></i>
+                                    <br>
+                                    <strong>信用卡</strong>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="mobile" value="行動支付">
+                                <label class="form-check-label" for="mobile">
+                                    <i class="fas fa-mobile-alt fa-2x text-info"></i>
+                                    <br>
+                                    <strong>行動支付</strong>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-check-circle"></i> 確認付款 NT$ {{ final_total }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-receipt"></i> 結帳明細</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>商品總額:</span>
+                        <span>NT$ {{ cart_total }}</span>
+                    </div>
+
+                    {% if member_discount > 0 %}
+                    <div class="d-flex justify-content-between mb-2 text-success">
+                        <span>會員折扣 ({{ (member.discount * 100)|int }}%):</span>
+                        <span>-NT$ {{ member_discount }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if bulk_discount > 0 %}
+                    <div class="d-flex justify-content-between mb-2 text-info">
+                        <span>滿額折扣 (9折):</span>
+                        <span>-NT$ {{ bulk_discount }}</span>
+                    </div>
+                    {% endif %}
+
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <strong>應付金額:</strong>
+                        <strong class="price-text">NT$ {{ final_total }}</strong>
+                    </div>
+
+                    {% if member %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-gift"></i>
+                        <strong>會員專屬:</strong><br>
+                        您已享有 {{ (member.discount * 100)|int }}% 折扣優惠！
+                    </div>
+                    {% endif %}
+
+                    {% if bulk_discount > 0 %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-percentage"></i>
+                        <strong>滿額優惠:</strong><br>
+                        消費滿 NT$ 500 享有 9 折優惠！
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if member %}
+        <div class="card mt-3">
+            <div class="card-header member-info">
+                <h6 class="mb-0"><i class="fas fa-user"></i> 會員資訊</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>姓名:</strong> {{ member.name }}</p>
+                <p><strong>等級:</strong> {{ member.level }}</p>
+                <p><strong>本次消費積分:</strong> {{ (final_total // 10)|int }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card mt-3">
+            <div class="card-header bg-warning">
+                <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> 注意事項</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled small">
+                    <li><i class="fas fa-check text-success"></i> 確認付款後將自動扣除庫存</li>
+                    <li><i class="fas fa-check text-success"></i> 系統將產生電子收據</li>
+                    <li><i class="fas fa-check text-success"></i> 付款完成後購物車將清空</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
