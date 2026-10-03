@@ -62,6 +62,13 @@ python app.py
 http://localhost:5000
 ```
 
+### 執行回歸測試
+```bash
+python -m unittest -v
+```
+
+部署時請設定 `FLASK_SECRET_KEY` 環境變數；未設定時會於程式啟動時產生隨機金鑰；多程序部署請務必設定此環境變數。
+
 ## 📖 使用指南
 
 ### 🧪 測試會員編號

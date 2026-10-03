@@ -30,8 +30,10 @@
             <div class="card-body">
                 <div class="row mb-4">
                     <div class="col-md-6">
+                        <h6><i class="fas fa-hashtag"></i> 交易編號</h6>
+                        <p class="mb-0">{{ id }}</p>
                         <h6><i class="fas fa-calendar"></i> 交易日期</h6>
-                        <p class="mb-0">{{ moment().format('YYYY年MM月DD日 HH:mm:ss') }}</p>
+                        <p class="mb-0">{{ created_at }}</p>
                     </div>
                     <div class="col-md-6">
                         <h6><i class="fas fa-credit-card"></i> 付款方式</h6>
@@ -67,13 +69,13 @@
                             {% if member_discount > 0 %}
                             <tr>
                                 <th colspan="3" class="text-end text-success">會員折扣:</th>
-                                <th class="text-success">-NT$ {{ member_discount }}</th>
+                                <th class="text-success">-NT$ {{ member_discount|int }}</th>
                             </tr>
                             {% endif %}
                             {% if bulk_discount > 0 %}
                             <tr>
                                 <th colspan="3" class="text-end text-info">滿額折扣:</th>
-                                <th class="text-info">-NT$ {{ bulk_discount }}</th>
+                                <th class="text-info">-NT$ {{ bulk_discount|int }}</th>
                             </tr>
                             {% endif %}
                             <tr class="table-primary">
@@ -96,7 +98,7 @@
                     <div class="col-md-6">
                         <i class="fas fa-coins fa-2x text-warning"></i>
                         <h6 class="mt-2">本次獲得積分</h6>
-                        <h4 class="text-warning">{{ (final_total // 10)|int }}</h4>
+                        <h4 class="text-warning">{{ points_earned }}</h4>
                     </div>
                     <div class="col-md-6">
                         <i class="fas fa-percentage fa-2x text-success"></i>
